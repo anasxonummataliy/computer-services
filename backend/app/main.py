@@ -275,4 +275,43 @@ def delete_component(component_id: int, db: Session = Depends(get_db)):
     return {"message": "Extiyot qism o'chirildi"}
 
 
+@api.post("/create_default_users")
+def create_default_users(db: Session = Depends(get_db)):
+    manager = Users.get_by_email(db, "manager@gmail.com")
+    if manager:
+        Users.update(db, manager.id, {"role": "manager"})
+    else:
+        Users.create(
+            db,
+            {
+                "email": "manager@gmail.com",
+                "password": "manager",
+                "first_name": "Admin",
+                "last_name": "Manager",
+                "role": "manager",
+                "phone": "123",
+                "person_type": "individual",
+            },
+        )
+
+    master = Users.get_by_email(db, "master@gmail.com")
+    if master:
+        Users.update(db, master.id, {"role": "master"})
+    else:
+        Users.create(
+            db,
+            {
+                "email": "master@gmail.com",
+                "password": "master",
+                "first_name": "Usta",
+                "last_name": "Master",
+                "role": "master",
+                "phone": "456",
+                "person_type": "individual",
+            },
+        )
+
+    return {"message": "Rollari muvaffaqiyatli yangilandi!"}
+
+
 app.include_router(api)

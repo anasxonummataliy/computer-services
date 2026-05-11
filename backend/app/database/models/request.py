@@ -12,6 +12,7 @@ class SupportRequests(Base):
     title: Mapped[str] = mapped_column(String(255), nullable=False)
     description: Mapped[str] = mapped_column(String, nullable=True)
     device_model: Mapped[str] = mapped_column(String(255), nullable=True)
+    issue_type: Mapped[str] = mapped_column(String(100), nullable=True)
     owner_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
 
     owner = relationship("Users")

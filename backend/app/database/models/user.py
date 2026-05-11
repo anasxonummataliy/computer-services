@@ -17,8 +17,13 @@ class Users(Base):
     email: Mapped[str] = mapped_column(
         String(255), unique=True, index=True, nullable=False
     )
-    role: Mapped[str] = mapped_column(String(50), default="user")
     password: Mapped[str] = mapped_column(String(255), nullable=False)
+    first_name: Mapped[str] = mapped_column(String(100), nullable=True)
+    last_name: Mapped[str] = mapped_column(String(100), nullable=True)
+    phone: Mapped[str] = mapped_column(String(50), nullable=True)
+    role: Mapped[str] = mapped_column(String(50), default="user")
+    person_type: Mapped[str] = mapped_column(String(50), default="individual")
+    company_name: Mapped[str] = mapped_column(String(255), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
 
     @staticmethod
@@ -49,6 +54,12 @@ class Users(Base):
         new_user = cls(
             email=user_data["email"],
             password=hashed_pw,
+            first_name=user_data.get("first_name"),
+            last_name=user_data.get("last_name"),
+            phone=user_data.get("phone"),
+            role=user_data.get("role", "user"),
+            person_type=user_data.get("person_type", "individual"),
+            company_name=user_data.get("company_name"),
         )
 
         db.add(new_user)

@@ -14,7 +14,9 @@ class SupportRequests(Base):
     device_model: Mapped[str] = mapped_column(String(255), nullable=True)
     issue_type: Mapped[str] = mapped_column(String(100), nullable=True)
     owner_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
+    problem_area: Mapped[str] = mapped_column(String(255), nullable=True)
 
+    status: Mapped[str] = mapped_column(String(50), default="pending")
     owner = relationship("Users")
 
     @classmethod

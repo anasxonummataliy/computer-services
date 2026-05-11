@@ -119,7 +119,7 @@ def create_request(
     db: Session = Depends(get_db),
 ):
     data = request.model_dump()
-    data["owner_id"] = current_user.id  # MongoDB-dagi _id o'rniga id
+    data["owner_id"] = current_user.id
     return SupportRequests.create(db, data)
 
 

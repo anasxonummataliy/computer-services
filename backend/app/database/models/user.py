@@ -1,62 +1,69 @@
 from datetime import datetime
-import math
 import secrets
-from bson import ObjectId
-from app.database.base import db
+from typing import Optional, Tuple
+from sqlalchemy import String, DateTime, func
+from sqlalchemy.orm import Mapped, mapped_column, Session
+from app.database.base import Base
 from passlib.context import CryptContext
 
-from app.utils.fix_obj_ids import fix_object_ids
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+pwd_context = CryptContext(schemes=["argon2"], deprecated="auto")
 
 
-class Users:
-    collection = db.users
+class Users(Base):
+    __tablename__ = "users"
 
-    @classmethod
-    def get(cls, filters: dict = {}):
-        return cls.collection.find_one(filters)
-
-    @classmethod
-    def get_all(cls, filters: dict = {}):
-        users = cls.collection.find(filters)
-        return [fix_object_ids(user) for user in users]
-
-    @classmethod
-    def update(cls, user_id: str, data: dict):
-        return cls.collection.update_one({"_id": ObjectId(user_id)}, {"$set": data})
-
-    @classmethod
-    def delete(cls, user_id: str):
-        return cls.collection.delete_one({"_id": ObjectId(user_id)})
+    id: Mapped[int] = mapped_column(primary_key=True, index=True)
+    email: Mapped[str] = mapped_column(
+        String(255), unique=True, index=True, nullable=False
+    )
+    role: Mapped[str] = mapped_column(String(50), default="user")
+    password: Mapped[str] = mapped_column(String(255), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
 
     @staticmethod
     def hash_password(password: str) -> str:
         return pwd_context.hash(password)
 
     @staticmethod
-    def verify_password(plain_password, hashed_password):
+    def verify_password(plain_password: str, hashed_password: str) -> bool:
         return pwd_context.verify(plain_password, hashed_password)
 
     @classmethod
-    def create(cls, user_data: dict):
+    def get_by_email(cls, db: Session, email: str) -> Optional["Users"]:
+        return db.query(cls).filter(cls.email == email).first()
+
+    @classmethod
+    def get_by_id(cls, db: Session, user_id: int) -> Optional["Users"]:
+        return db.query(cls).filter(cls.id == user_id).first()
+
+    @classmethod
+    def create(cls, db: Session, user_data: dict) -> Tuple[int, Optional[str]]:
+        random_password = None
         if not user_data.get("password"):
-            random_password = math.floor(secrets.randbelow(1000000000))
-            user_data["password"] = str(random_password)
-            user_data["created_at"] = datetime.now()
-        else:
-            random_password = None
+            random_password = str(secrets.randbelow(10**9))
+            user_data["password"] = random_password
 
-        user_data["password"] = cls.hash_password(user_data["password"])
-        inserted_id = cls.collection.insert_one(user_data).inserted_id
-        return inserted_id, random_password
+        hashed_pw = cls.hash_password(user_data["password"])
+
+        new_user = cls(
+            email=user_data["email"],
+            password=hashed_pw,
+        )
+
+        db.add(new_user)
+        db.commit()
+        db.refresh(new_user)
+        return new_user.id, random_password
 
     @classmethod
-    def get_by_email(cls, email: str):
-        return cls.collection.find_one({"email": email})
+    def update(cls, db: Session, user_id: int, data: dict) -> None:
+        db.query(cls).filter(cls.id == user_id).update(data)
+        db.commit()
 
     @classmethod
-    def get_by_id(cls, user_id: str):
-        user = cls.collection.find_one({"_id": ObjectId(user_id)})
-        print(user)
-        return fix_object_ids(user)
+    def delete(cls, db: Session, user_id: int) -> None:
+        user = cls.get_by_id(db, user_id)
+        if user:
+            db.delete(user)
+            db.commit()

@@ -1,51 +1,66 @@
-from bson import ObjectId
+from typing import List, Optional
+from sqlalchemy import String, ForeignKey, Integer
+from sqlalchemy.orm import Mapped, mapped_column, Session, relationship
+from app.database.base import Base
 from fastapi import HTTPException
-from app.database.base import db
-from app.utils.fix_obj_ids import fix_object_ids
 
 
-class SupportRequests:
-    collection = db.support_requests
+class SupportRequests(Base):
+    __tablename__ = "support_requests"
 
-    @classmethod
-    def create(cls, data: dict):
-        cls.collection.insert_one(data).inserted_id
-        return fix_object_ids(data)
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    title: Mapped[str] = mapped_column(String(255), nullable=False)
+    description: Mapped[str] = mapped_column(String, nullable=True)
+    device_model: Mapped[str] = mapped_column(String(255), nullable=True)
+    owner_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
 
-    @classmethod
-    def get_by_id(cls, req_id: str):
-        if ObjectId.is_valid(req_id) is False:
-            raise HTTPException(404, "Support request not found")
-        doc = cls.collection.find_one({"_id": ObjectId(req_id)})
-        return fix_object_ids(doc) if doc else None
+    owner = relationship("Users")
 
     @classmethod
-    def get_by_owner_id(cls, owner_id: str):
-        if ObjectId.is_valid(owner_id) is False:
-            raise HTTPException(404, "User not found")
-        docs = list(cls.collection.find({"owner._id": ObjectId(owner_id)}))
-        return [fix_object_ids(d) for d in docs]
+    def create(cls, db: Session, data: dict):
+        new_request = cls(**data)
+        db.add(new_request)
+        db.commit()
+        db.refresh(new_request)
+        return new_request
 
     @classmethod
-    def list(cls, filter: dict = {}):
-        docs = list(cls.collection.find(filter))
-        return [fix_object_ids(d) for d in docs]
+    def get_by_id(cls, db: Session, req_id: int):
+        doc = db.query(cls).filter(cls.id == req_id).first()
+        if not doc:
+            raise HTTPException(status_code=404, detail="Support request not found")
+        return doc
 
     @classmethod
-    def update(cls, req_id: str, data: dict):
-        if ObjectId.is_valid(req_id) is False:
-            raise HTTPException(404, "Support request not found")
-        result = cls.collection.update_one(
-            {"_id": ObjectId(req_id)}, {"$set": data})
-        if result.matched_count == 0:
-            raise HTTPException(404, "Support request not found")
-        return {"modified_count": result.modified_count}
+    def get_by_owner_id(cls, db: Session, owner_id: int) -> List["SupportRequests"]:
+        return db.query(cls).filter(cls.owner_id == owner_id).all()
 
     @classmethod
-    def delete(cls, req_id: str):
-        if ObjectId.is_valid(req_id) is False:
-            raise HTTPException(404, "Support request not found")
-        result = cls.collection.delete_one({"_id": ObjectId(req_id)})
-        if result.deleted_count == 0:
-            raise HTTPException(404, "Support request not found")
-        return {"deleted_count": result.deleted_count}
+    def list(cls, db: Session, filters: dict = {}) -> List["SupportRequests"]:
+        query = db.query(cls)
+        if filters:
+            query = query.filter_by(**filters)
+        return query.all()
+
+    @classmethod
+    def update(cls, db: Session, req_id: int, data: dict):
+        db_req = db.query(cls).filter(cls.id == req_id).first()
+        if not db_req:
+            raise HTTPException(status_code=404, detail="Support request not found")
+
+        for key, value in data.items():
+            setattr(db_req, key, value)
+
+        db.commit()
+        db.refresh(db_req)
+        return {"modified": True}
+
+    @classmethod
+    def delete(cls, db: Session, req_id: int):
+        db_req = db.query(cls).filter(cls.id == req_id).first()
+        if not db_req:
+            raise HTTPException(status_code=404, detail="Support request not found")
+
+        db.delete(db_req)
+        db.commit()
+        return {"deleted": True}

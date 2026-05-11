@@ -3,6 +3,8 @@
 
 <head>
     <meta charset="UTF-8">
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns=%22http://w3.org viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2280%22>🛠️</text></svg>">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - DernSupport</title>
     <script src="https://cdn.tailwindcss.com"></script>
@@ -23,12 +25,12 @@
 </head>
 
 <body class="bg-gray-50">
-   
+
     <header class="bg-white shadow-sm sticky top-0 z-40">
         <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
                 <div class="flex items-center">
-                   
+
                     <button id="mobileMenuBtn"
                         class="md:hidden p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500">
                         <i class="fas fa-bars text-xl"></i>
@@ -52,7 +54,7 @@
     </header>
 
     <div class="flex">
-       
+
         <aside id="sidebar"
             class="fixed inset-y-0 left-0 z-30 w-64 bg-white shadow-sm transform -translate-x-full transition-transform duration-300 ease-in-out md:translate-x-0 md:static md:inset-0">
             <div class="flex items-center justify-between h-16 px-4 border-b md:hidden">
@@ -63,24 +65,24 @@
             </div>
             <nav class="mt-8 md:mt-0 pt-4">
                 <div id="userNav" class="space-y-2 px-4">
-                   
+
                 </div>
                 <div id="managerNav" class="space-y-2 px-4 hidden">
-                   
+
                 </div>
                 <div id="masterNav" class="space-y-2 px-4 hidden">
-                   
+
                 </div>
             </nav>
         </aside>
 
-       
+
         <div id="sidebarOverlay" class="fixed inset-0 bg-black bg-opacity-50 z-20 hidden md:hidden"></div>
 
-       
+
         <main class="flex-1 min-h-screen md:ml-0">
             <div class="p-4 sm:p-6 lg:p-8">
-               
+
                 <div id="userDashboard" class="hidden">
                     <div class="flex  justify-between item-center mb-6 sm:mb-8">
                         <h1 class="text-xl sm:text-2xl font-bold text-gray-900 mb-2">Mening so'rovlarim</h1>
@@ -90,31 +92,31 @@
                         </button>
                     </div>
                     <div id="userRequests" class="grid gap-4 sm:gap-6">
-                       
+
                     </div>
                 </div>
 
-               
+
                 <div id="managerDashboard" class="hidden">
                     <div class="mb-6 sm:mb-8">
                         <h1 class="text-xl sm:text-2xl font-bold text-gray-900">Manager Dashboard</h1>
                     </div>
                     <div id="managerContent">
-                       
+
                     </div>
                 </div>
 
-               
+
                 <div id="masterDashboard" class="hidden">
                     <div class="mb-6 sm:mb-8">
                         <h1 class="text-xl sm:text-2xl font-bold text-gray-900">Master Dashboard</h1>
                     </div>
                     <div id="masterContent">
-                       
+
                     </div>
                 </div>
 
-               
+
                 <div id="profileSection" class="hidden">
                     <div class="bg-white rounded-lg shadow p-4 sm:p-6">
                         <h2 class="text-lg sm:text-xl font-bold mb-4">Profil ma'lumotlari</h2>
@@ -154,7 +156,7 @@
                     </div>
                 </div>
 
-               
+
                 <div id="statisticsSection" class="hidden">
                     <div class="mb-6 sm:mb-8">
                         <h2 class="text-xl sm:text-2xl font-bold text-gray-900">Statistika</h2>
@@ -192,7 +194,7 @@
         </main>
     </div>
 
-   
+
     <div id="newRequestModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
         <div class="flex items-center justify-center min-h-screen p-4">
             <div class="bg-white rounded-lg max-w-2xl w-full p-4 sm:p-6 max-h-screen overflow-y-auto">
@@ -241,7 +243,7 @@
         </div>
     </div>
 
-   
+
     <div id="toast"
         class="fixed top-4 right-4 bg-green-500 text-white px-4 sm:px-6 py-3 rounded-lg shadow-lg hidden z-50">
         <div class="flex items-center">
@@ -250,7 +252,7 @@
         </div>
     </div>
 
-   
+
     <div id="createComponentModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
         <div class="flex items-center justify-center min-h-screen p-4">
             <div class="bg-white rounded-lg max-w-md w-full p-4 sm:p-6 max-h-screen overflow-y-auto">
@@ -290,7 +292,7 @@
         </div>
     </div>
 
-   
+
     <div id="editComponentModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
         <div class="flex items-center justify-center min-h-screen p-4">
             <div class="bg-white rounded-lg max-w-md w-full p-4 sm:p-6 max-h-screen overflow-y-auto">
@@ -331,7 +333,7 @@
         </div>
     </div>
 
-   
+
     <div id="createUserModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
         <div class="flex items-center justify-center min-h-screen p-4">
             <div class="bg-white rounded-lg max-w-md w-full p-4 sm:p-6 max-h-screen overflow-y-auto">
@@ -387,7 +389,7 @@
         </div>
     </div>
 
-   
+
     <div id="editUserModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
         <div class="flex items-center justify-center min-h-screen p-4">
             <div class="bg-white rounded-lg max-w-md w-full p-4 sm:p-6 max-h-screen overflow-y-auto">
@@ -439,7 +441,7 @@
         </div>
     </div>
 
-   
+
     <div id="masterEditModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
         <div class="flex items-center justify-center min-h-screen p-4">
             <div class="bg-white rounded-lg max-w-lg w-full p-4 sm:p-6 max-h-screen overflow-y-auto">
@@ -457,7 +459,7 @@
                         <select name="component_id" id="masterEditComponent" required
                             class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
                             <option value="">Komponent tanlang</option>
-                           
+
                         </select>
                     </div>
 

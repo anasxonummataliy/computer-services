@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Literal, Optional
 from pydantic import BaseModel
 
 
@@ -8,7 +8,7 @@ class UserRequest(BaseModel):
     email: str
     phone: str
     password: str
-    role: str
+    role: Literal["user", "manager", "master"] = "user"
     person_type: str
     company_name: Optional[str] = None
 

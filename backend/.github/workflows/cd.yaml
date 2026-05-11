@@ -1,53 +1,31 @@
-name: CI/CD Pipeline
+name: CD - Deploy to Server
 
 on:
-  push:
-    branches: [ "main" ]
+  workflow_run:
+    workflows: ["CI - Build and Push"]
+    types:
+      - completed
 
 jobs:
-  test:
+  deploy:
     runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     steps:
-      - uses: actions/checkout@v4
-      - name: Install uv
-        run: curl -LsSf https://astral.sh | sh
-      - name: Set up Python
-        run: uv python install 3.13
-      - name: Check formatting and linting
-        run: |
-          uv sync
-          # Agar ruff yoki black bo'lsa tekshiradi:
-          # uv run ruff check .
-
-  build-and-deploy:
-    needs: test
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Login to Docker Hub
-        uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-
-      - name: Build and Push
-        uses: docker/build-push-action@v5
-        with:
-          push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/repair-service:latest
-
-      - name: Deploy to Server
+      - name: Deploy via SSH
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.SERVER_IP }}
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            cd /path/to/your/project
+            # Loyiha papkasiga o'tamiz
+            cd /home/${{ secrets.SERVER_USER }}/repair-service
+
+            # Yangi imijni tortib olamiz
             docker compose pull
+
+            # Konteynerlarni yangilaymiz
             docker compose up -d
+
+            # Eski va keraksiz imijni tozalaymiz
+            docker image prune -f

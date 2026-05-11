@@ -1,11 +1,11 @@
-const API_BASE_URL = "https://anasxon.robohouse.tech/api"
+const API_BASE_URL = "https://api-support.anasxonummataliy.dev/api"
 
 
 const api = {
-  
+
   async request(endpoint, options = {}) {
     const url = `${API_BASE_URL}${endpoint}`
-    console.log("API Request:", url, options) 
+    console.log("API Request:", url, options)
 
     const config = {
       headers: {
@@ -23,9 +23,9 @@ const api = {
 
     try {
       const response = await fetch(url, config)
-      console.log("API Response:", response.status, response.statusText) 
+      console.log("API Response:", response.status, response.statusText)
 
-      
+
       if (response.status === 401 && accessToken) {
         console.log("Token expired, trying to refresh...")
         const refreshed = await this.refreshToken()
@@ -43,12 +43,12 @@ const api = {
       return response
     } catch (error) {
       console.error("API request failed:", error)
-      
+
       return this.getMockResponse(endpoint, options)
     }
   },
 
-  
+
   async login(email, password) {
     console.log("API login called with:", email)
     const response = await this.request("/login", {
@@ -90,7 +90,7 @@ const api = {
     return response
   },
 
-  
+
   async createSupportRequest(requestData) {
     const response = await this.request("/support_request", {
       method: "POST",
@@ -136,7 +136,7 @@ const api = {
     return response
   },
 
-  
+
   async getUsers() {
     const response = await this.request("/users")
     return response
@@ -166,7 +166,7 @@ const api = {
     return response
   },
 
-  
+
   async getComponents() {
     const response = await this.request("/components")
     return response
@@ -203,7 +203,7 @@ const api = {
     return response
   },
 
-  
+
   getMockResponse(endpoint, options) {
     console.log("Using mock data for:", endpoint)
 
@@ -218,7 +218,7 @@ const api = {
               first_name: "Test",
               last_name: "User",
               email: "test@example.com",
-              role: "master", 
+              role: "master",
             },
           }),
       })
@@ -234,7 +234,7 @@ const api = {
             last_name: "Master",
             email: "master@example.com",
             phone: "+998901234567",
-            role: "master", 
+            role: "master",
           }),
       })
     }
@@ -335,7 +335,7 @@ const api = {
       return Promise.resolve({ ok: true })
     }
 
-    
+
     return Promise.resolve({
       ok: false,
       status: 404,
